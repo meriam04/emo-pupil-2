@@ -21,7 +21,7 @@ from tensorflow.keras.layers import (
 from typing import Optional, Tuple
 
 
-from data_processing.process_data import TIMES_FILE_FORMAT
+from data_processing.face.process_data import TIMES_FILE_FORMAT
 
 
 CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/binary-{epoch:03d}.ckpt"

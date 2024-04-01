@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 import csv
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
+import numpy as np
+import matlab.engine
+import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 import pickle
@@ -11,6 +14,10 @@ import sys
 from typing import Dict, List
 
 EXCLUSION_WORDS = ("transition",)
+
+MAT_FILE_FORMAT = "pupil_{}.mat"
+DATA_FILE_FORMAT = "data_{}.csv"
+SEGMENTS_FILE_FORMAT = "segments_{}.csv"
 OUTPUT_FILE_FORMAT = "pupil_{}_{}.pkl"
 
 SEG_NAME_TO_EMOTION = {
@@ -32,13 +39,16 @@ class Segment:
 
 
 def process_participant(
-    data_dir: Path, data_file: Path, segments_file: Path, inits: str
+    eng, data_dir: Path, pupil_file: str, inits: str, plot_matlab: bool = False, plot_result: bool = False
 ):
-    # TODO: Call process_data.m from python
+    mat_file = MAT_FILE_FORMAT.format(inits)
+    data_file = DATA_FILE_FORMAT.format(inits)
+    segments_file = SEGMENTS_FILE_FORMAT.format(inits)
+    eng.process_data(str(os.path.join(data_dir, '')), pupil_file, mat_file, data_file, segments_file, plot_matlab, nargout=0)
 
     # Read the segments csv file
     segments: List[Segment] = []
-    with open(segments_file, "r") as f:
+    with open(data_dir / segments_file, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             segments.append(
@@ -52,7 +62,7 @@ def process_participant(
     # Read the data csv file
     curr_seg_idx = 0
     data: Dict[Dict[List[float], List[float]]] = {segments[0].name: {"times": [], "diameters": []}}
-    with open(data_file, "r") as f:
+    with open(data_dir / data_file, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             # Get the current segment for each time
@@ -81,37 +91,36 @@ def process_participant(
             # Cubic smoothing
             cspline = CubicSpline(seg_data["times"], seg_data["diameters"])
 
-            '''
-            TODO: Implement option to graph the data and save it in a separate directory
-
-            import matplotlib.pyplot as plt
-            import numpy as np
-            plt.clf()
-            xnew = np.linspace(0, seg_data["times"][-1], num=1001)
-            plt.plot(xnew, cspline(xnew), 'o', label='spline')
-            plt.plot(seg_data["times"], seg_data["diameters"], 'k', label='discrete')
-            plt.savefig(f'./{output_file}.png')
-            '''
+            if plot_result:
+                plt.clf()
+                xnew = np.linspace(0, seg_data["times"][-1], num=1001)
+                plt.plot(xnew, cspline(xnew), 'o', label='spline')
+                plt.plot(seg_data["times"], seg_data["diameters"], 'k', label='discrete')
+                plt.savefig(f'./{output_file}.png')
 
             with open(output_file, 'wb') as f:
                 pickle.dump(cspline, f)
 
 
-def process_data(data_dir: Path):
+def process_data(
+    data_dir: Path,
+    plot_matlab: bool = False,
+    plot_result: bool = False,
+):
+    eng = matlab.engine.start_matlab()
+    eng.addpath(str(Path(__file__).parent))
+
     # Iterate over all csv files in the data_dir
     csv_files = {}
     for file in os.listdir(data_dir):
         # If a matching data csv file is found add a new tuple for that participant
-        if match := re.search("data_(?P<inits>\w+)\.csv", Path(file).name):
-            csv_files[match["inits"]] = [data_dir / file, ""]
-        # If a matching segments csv file is found add it to the tuple for that participant
-        elif match := re.search("segments_(?P<inits>\w+)\.csv", Path(file).name):
-            csv_files[match["inits"]][1] = data_dir / file
+        if match := re.search("(?P<inits>\w+)_all_gaze\.csv", Path(file).name):
+            csv_files[match["inits"]] = file
 
     # Iterate over all found csv files
-    for inits, files in csv_files.items():
+    for inits, csv_file in csv_files.items():
         # Process each participants pupillometry data
-        process_participant(data_dir, files[0], files[1], inits)
+        process_participant(eng, data_dir, csv_file, inits, plot_matlab, plot_result)
 
 
 if __name__ == "__main__":

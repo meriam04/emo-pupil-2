@@ -13,7 +13,7 @@ from tensorflow.data import AUTOTUNE, Dataset
 from tensorflow.keras.utils import img_to_array
 from typing import Tuple
 
-from data_processing.process_data import BINARY_EMOTIONS, TIMES_FILE_FORMAT
+from data_processing.face.process_data import BINARY_EMOTIONS, TIMES_FILE_FORMAT
 import models.face as face
 import models.pupil as pupil
 
