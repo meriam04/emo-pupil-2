@@ -170,12 +170,12 @@ def process_data(
     binary: bool,
     get_frames: bool = True,
     crop_images: bool = True,
-    logging: bool = False
+    log: bool = False,
 ) -> Path:
     """
     Extracts frames from all videos, then crops them and separates them to the correct directory in the output path.
     """
-    if logging:
+    if log:
         logging.basicConfig(level=logging.DEBUG)
 
     # Get all the video files in the directory

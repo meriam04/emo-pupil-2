@@ -39,12 +39,25 @@ class Segment:
 
 
 def process_participant(
-    eng, data_dir: Path, pupil_file: str, inits: str, plot_matlab: bool = False, plot_result: bool = False
+    eng,
+    data_dir: Path,
+    pupil_file: str,
+    inits: str,
+    plot_matlab: bool = False,
+    plot_result: bool = False,
 ):
     mat_file = MAT_FILE_FORMAT.format(inits)
     data_file = DATA_FILE_FORMAT.format(inits)
     segments_file = SEGMENTS_FILE_FORMAT.format(inits)
-    eng.process_data(str(os.path.join(data_dir, '')), pupil_file, mat_file, data_file, segments_file, plot_matlab, nargout=0)
+    eng.process_data(
+        str(os.path.join(data_dir, "")),
+        pupil_file,
+        mat_file,
+        data_file,
+        segments_file,
+        plot_matlab,
+        nargout=0,
+    )
 
     # Read the segments csv file
     segments: List[Segment] = []
@@ -61,7 +74,9 @@ def process_participant(
 
     # Read the data csv file
     curr_seg_idx = 0
-    data: Dict[Dict[List[float], List[float]]] = {segments[0].name: {"times": [], "diameters": []}}
+    data: Dict[Dict[List[float], List[float]]] = {
+        segments[0].name: {"times": [], "diameters": []}
+    }
     with open(data_dir / data_file, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -72,8 +87,12 @@ def process_participant(
                 data[segments[curr_seg_idx].name] = {"times": [], "diameters": []}
 
             # Add the data point to the current segment
-            data[segments[curr_seg_idx].name]["times"].append(time - segments[curr_seg_idx].start)
-            data[segments[curr_seg_idx].name]["diameters"].append(float(row["diameters"]))
+            data[segments[curr_seg_idx].name]["times"].append(
+                time - segments[curr_seg_idx].start
+            )
+            data[segments[curr_seg_idx].name]["diameters"].append(
+                float(row["diameters"])
+            )
 
     # Write the output csv files
     for seg_name, seg_data in data.items():
@@ -94,11 +113,13 @@ def process_participant(
             if plot_result:
                 plt.clf()
                 xnew = np.linspace(0, seg_data["times"][-1], num=1001)
-                plt.plot(xnew, cspline(xnew), 'o', label='spline')
-                plt.plot(seg_data["times"], seg_data["diameters"], 'k', label='discrete')
-                plt.savefig(f'./{output_file}.png')
+                plt.plot(xnew, cspline(xnew), "o", label="spline")
+                plt.plot(
+                    seg_data["times"], seg_data["diameters"], "k", label="discrete"
+                )
+                plt.savefig(f"./{output_file}.png")
 
-            with open(output_file, 'wb') as f:
+            with open(output_file, "wb") as f:
                 pickle.dump(cspline, f)
 
 
@@ -121,6 +142,9 @@ def process_data(
     for inits, csv_file in csv_files.items():
         # Process each participants pupillometry data
         process_participant(eng, data_dir, csv_file, inits, plot_matlab, plot_result)
+
+    # Close the matlab engine
+    eng.quit()
 
 
 if __name__ == "__main__":
