@@ -1,0 +1,1 @@
+from data_processing.face.process_data import process_data

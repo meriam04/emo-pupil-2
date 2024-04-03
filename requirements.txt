@@ -1,3 +1,5 @@
+matlabengine==24.1.2
+matplotlib==3.8.3
 moviepy==1.0.3
 numpy==1.26.1
 opencv-python==4.8.1.78

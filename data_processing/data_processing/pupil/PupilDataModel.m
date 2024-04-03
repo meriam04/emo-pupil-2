@@ -173,8 +173,8 @@ classdef PupilDataModel < handle
             obj.segmentsTable = table();
             
             % Compatibility check:
-            assert(ispc,['This script will not work on any OS other'...
-                ' than Windows.']);
+            % assert(ispc,['This script will not work on any OS other'...
+                % ' than Windows.']);
             
             if nargin>0
                 obj.filename = filename;

@@ -3,7 +3,7 @@ import pytest
 from pathlib import Path
 import logging
 
-from data_processing.process_data import separate_images
+from data_processing.face.process_data import separate_images
 
 TEST_FILES_DIR = Path(__file__).parent / "test_files" / "separate_images"
 TEAR_DOWN = True
