@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 from pathlib import Path
 import sys
 
@@ -22,5 +23,61 @@ def process_data(
     pupil.process_data(pupil_dir, plot_matlab, plot_result)
 
 
+def parse_arguments():
+    """
+    Parse command line arguments.
+    """
+    parser = argparse.ArgumentParser(description="Process video and pupil data.")
+    parser.add_argument(
+        "video_dir", type=Path, help="Input directory containing videos."
+    )
+    parser.add_argument(
+        "output_path",
+        type=Path,
+        help="Output path where train/val/test directories will be created.",
+    )
+    parser.add_argument(
+        "pupil_dir", type=Path, help="Input directory containing pupil data."
+    )
+    parser.add_argument(
+        "-b",
+        "--binary-face",
+        action="store_true",
+        help="Whether to use binary face mode.",
+    )
+    parser.add_argument(
+        "-f", "--get-frames", action="store_true", help="Whether to get frames."
+    )
+    parser.add_argument(
+        "-c", "--crop-images", action="store_true", help="Whether to crop images."
+    )
+    parser.add_argument(
+        "-l", "--log", action="store_true", help="Whether to enable logging."
+    )
+    parser.add_argument(
+        "-m",
+        "--plot-matlab",
+        action="store_true",
+        help="Whether to plot the data with Matlab.",
+    )
+    parser.add_argument(
+        "-r", "--plot-result", action="store_true", help="Whether to plot results."
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    process_data(Path(sys.argv[1]), Path(sys.argv[1]), Path(sys.argv[2]))
+    args = parse_arguments()
+
+    # Call the function with parsed arguments
+    process_data(
+        args.video_dir,
+        args.output_path,
+        args.pupil_dir,
+        args.binary_face,
+        args.get_frames,
+        args.crop_images,
+        args.log,
+        args.plot_matlab,
+        args.plot_result,
+    )

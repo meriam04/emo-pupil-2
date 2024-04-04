@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import csv
 from dataclasses import dataclass
 import numpy as np
@@ -128,6 +129,7 @@ def process_data(
     plot_matlab: bool = False,
     plot_result: bool = False,
 ):
+    # Start the matlab engine
     eng = matlab.engine.start_matlab()
     eng.addpath(str(Path(__file__).parent))
 
@@ -147,5 +149,30 @@ def process_data(
     eng.quit()
 
 
+def parse_args():
+    """
+    Parse command line arguments.
+    """
+    parser = argparse.ArgumentParser(description="Process data.")
+    parser.add_argument("data_dir", type=Path, help="Input directory containing data.")
+    parser.add_argument(
+        "-m",
+        "--plot-matlab",
+        action="store_true",
+        help="Whether to plot the data with Matlab.",
+    )
+    parser.add_argument(
+        "-r", "--plot-result", action="store_true", help="Whether to plot results."
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    process_data(Path(sys.argv[1]))
+    args = parse_args()
+
+    # Call the function with parsed arguments
+    process_data(
+        args.data_dir,
+        args.plot_matlab,
+        args.plot_result,
+    )
