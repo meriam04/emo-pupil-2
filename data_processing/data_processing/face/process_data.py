@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import csv
 import logging
 import os
@@ -224,10 +225,35 @@ def process_data(
 
 
 if __name__ == "__main__":
-    # Convert string arguments to boolean values
-    binary = sys.argv[3].lower() == "true"
-    get_frames = sys.argv[4].lower() == "true"
-    crop_images = sys.argv[5].lower() == "true"
+    parser = argparse.ArgumentParser(description="Process video data.")
+    parser.add_argument(
+        "video_dir", type=Path, help="Input directory containing videos."
+    )
+    parser.add_argument(
+        "output_path",
+        type=Path,
+        help="Output path where train/val/test directories will be created.",
+    )
+    parser.add_argument(
+        "-b", "--binary", action="store_true", help="Whether to use binary mode."
+    )
+    parser.add_argument(
+        "-f", "--get-frames", action="store_true", help="Whether to get frames."
+    )
+    parser.add_argument(
+        "-c", "--crop-images", action="store_true", help="Whether to crop images."
+    )
+    parser.add_argument(
+        "-l", "--log", action="store_true", help="Whether to log debug messages."
+    )
+    args = parser.parse_args()
 
-    # Call the function with converted boolean values
-    process_data(Path(sys.argv[1]), Path(sys.argv[2]), binary, get_frames, crop_images)
+    # Call the function with parsed arguments
+    process_data(
+        args.video_dir,
+        args.output_path,
+        args.binary,
+        args.get_frames,
+        args.crop_images,
+        args.log,
+    )
