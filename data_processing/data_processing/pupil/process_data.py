@@ -149,7 +149,10 @@ def process_data(
     eng.quit()
 
 
-if __name__ == "__main__":
+def parse_args():
+    """
+    Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description="Process data.")
     parser.add_argument("data_dir", type=Path, help="Input directory containing data.")
     parser.add_argument(
@@ -161,7 +164,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-r", "--plot-result", action="store_true", help="Whether to plot results."
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
 
     # Call the function with parsed arguments
     process_data(

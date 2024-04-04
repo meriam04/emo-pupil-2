@@ -224,7 +224,10 @@ def process_data(
     return output_path
 
 
-if __name__ == "__main__":
+def parse_args():
+    """
+    Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description="Process video data.")
     parser.add_argument(
         "video_dir", type=Path, help="Input directory containing videos."
@@ -246,7 +249,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-l", "--log", action="store_true", help="Whether to log debug messages."
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_args()
 
     # Call the function with parsed arguments
     process_data(

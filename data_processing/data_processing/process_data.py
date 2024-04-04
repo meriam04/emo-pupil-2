@@ -23,7 +23,10 @@ def process_data(
     pupil.process_data(pupil_dir, plot_matlab, plot_result)
 
 
-if __name__ == "__main__":
+def parse_arguments():
+    """
+    Parse command line arguments.
+    """
     parser = argparse.ArgumentParser(description="Process video and pupil data.")
     parser.add_argument(
         "video_dir", type=Path, help="Input directory containing videos."
@@ -60,7 +63,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-r", "--plot-result", action="store_true", help="Whether to plot results."
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
 
     # Call the function with parsed arguments
     process_data(
