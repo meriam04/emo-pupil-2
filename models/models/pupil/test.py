@@ -7,6 +7,9 @@ from models.pupil.train import create_model, get_data
 CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/binary-006.ckpt"
 
 if __name__ == "__main__":
+    # Disable annoying tensorflow warnings
+    tf.get_logger().setLevel('ERROR')
+
     # fix random seed for reproducibility
     tf.random.set_seed(496)
 

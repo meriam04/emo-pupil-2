@@ -11,7 +11,6 @@ from pathlib import Path
 import pickle
 import re
 from scipy.interpolate import CubicSpline
-import sys
 from typing import Dict, List
 
 EXCLUSION_WORDS = ("transition",)
@@ -129,16 +128,24 @@ def process_data(
     plot_matlab: bool = False,
     plot_result: bool = False,
 ):
-    # Start the matlab engine
-    eng = matlab.engine.start_matlab()
-    eng.addpath(str(Path(__file__).parent))
-
     # Iterate over all csv files in the data_dir
     csv_files = {}
     for file in os.listdir(data_dir):
         # If a matching data csv file is found add a new tuple for that participant
         if match := re.search("(?P<inits>\w+)_all_gaze\.csv", Path(file).name):
             csv_files[match["inits"]] = file
+            with open(data_dir / file, 'r+') as f:
+                lines = f.readlines()
+                f.seek(0)
+                for i, line in enumerate(lines):
+                    if i == 0 and (match := re.search(r"(?P<before_time>.*),TIME\(.+\),(?P<after_time>.*)\n", line)):
+                        f.write(match["before_time"] + ",TIME," + match["after_time"] + '\n')
+                    else:
+                        f.write(line)
+
+    # Start the matlab engine
+    eng = matlab.engine.start_matlab()
+    eng.addpath(str(Path(__file__).parent))
 
     # Iterate over all found csv files
     for inits, csv_file in csv_files.items():
