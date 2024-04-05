@@ -259,7 +259,7 @@ if __name__ == "__main__":
         args.video_dir,
         args.output_path,
         args.binary,
-        args.get_frames,
-        args.crop_images,
+        args.skip_get_frames,
+        args.skip_crop_images,
         args.log,
     )
