@@ -12,13 +12,13 @@ def process_data(
     output_path: Path,
     pupil_dir: Path,
     binary_face: bool = False,
-    get_frames: bool = True,
-    crop_images: bool = True,
+    skip_get_frames: bool = False,
+    skip_crop_images: bool = False,
     log: bool = False,
     plot_matlab: bool = False,
     plot_result: bool = False,
 ):
-    face.process_data(video_dir, output_path, binary_face, get_frames, crop_images, log)
+    face.process_data(video_dir, output_path, binary_face, skip_get_frames, skip_crop_images, log)
     pupil.process_data(pupil_dir, plot_matlab, plot_result)
 
 
@@ -45,10 +45,10 @@ def parse_arguments():
         help="Whether to use binary face mode.",
     )
     parser.add_argument(
-        "-f", "--get-frames", action="store_true", help="Whether to get frames."
+        "-f", "--skip-get-frames", action="store_true", help="Whether to get frames."
     )
     parser.add_argument(
-        "-c", "--crop-images", action="store_true", help="Whether to crop images."
+        "-c", "--skip-crop-images", action="store_true", help="Whether to crop images."
     )
     parser.add_argument(
         "-l", "--log", action="store_true", help="Whether to enable logging."

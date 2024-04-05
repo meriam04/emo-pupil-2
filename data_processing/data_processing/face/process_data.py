@@ -168,8 +168,8 @@ def process_data(
     video_dir: Path,
     output_path: Path,
     binary: bool,
-    skip_get_frames: bool = True,
-    skip_crop_images: bool = True,
+    skip_get_frames: bool = False,
+    skip_crop_images: bool = False,
     log: bool = False,
 ) -> Path:
     """
