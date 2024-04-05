@@ -8,7 +8,7 @@ from PIL import Image
 import re
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import sys
-from tensorflow import convert_to_tensor, random
+from tensorflow import convert_to_tensor, get_logger, random
 from tensorflow.data import AUTOTUNE, Dataset
 from tensorflow.keras.utils import img_to_array
 from typing import Tuple
@@ -94,7 +94,10 @@ def create_confusion_matrix(labels, predictions, classes):
     plt.savefig(Path(__file__).parent / 'confusion_matrix.png')
 
 if __name__ == "__main__":
-    # fix random seed for reproducibility
+    # Disable annoying tensorflow warnings
+    get_logger().setLevel('ERROR')
+
+    # Fix random seed for reproducibility
     random.set_seed(496)
 
     window_size = 100

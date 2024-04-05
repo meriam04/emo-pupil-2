@@ -8,6 +8,9 @@ BINARY_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/binary-010.ckpt"
 MULTICLASS_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/multiclass-009.ckpt"
 
 if __name__ == "__main__":
+    # Disable annoying tensorflow warnings
+    tf.get_logger().setLevel('ERROR')
+
     # fix random seed for reproducibility
     tf.random.set_seed(496)
 
