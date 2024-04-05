@@ -2,7 +2,6 @@
 
 import argparse
 from pathlib import Path
-import sys
 
 import data_processing.face as face
 import data_processing.pupil as pupil

@@ -8,7 +8,6 @@ from pathlib import Path
 import re
 import shutil
 from sklearn.model_selection import train_test_split
-import sys
 
 from data_processing.face.crop_ui import run_image_cropper_with_image
 from data_processing.face.video_to_images import extract_frames
@@ -169,8 +168,8 @@ def process_data(
     video_dir: Path,
     output_path: Path,
     binary: bool,
-    get_frames: bool = True,
-    crop_images: bool = True,
+    skip_get_frames: bool = True,
+    skip_crop_images: bool = True,
     log: bool = False,
 ) -> Path:
     """
@@ -187,12 +186,12 @@ def process_data(
     for video_file in video_files:
         video_file_path = video_dir / video_file
         image_dir = video_file_path.parent / video_file_path.stem
-        if get_frames:
+        if not skip_get_frames:
             extract_frames(video_file_path, RATE, image_dir)
         image_dirs.append(image_dir)
 
     # Crop the images using the UI
-    if crop_images:
+    if not skip_crop_images:
         for image_dir in image_dirs:
             logging.debug("Cropping images in %s", image_dir)
 
@@ -241,10 +240,10 @@ def parse_args():
         "-b", "--binary", action="store_true", help="Whether to use binary mode."
     )
     parser.add_argument(
-        "-f", "--get-frames", action="store_true", help="Whether to get frames."
+        "-f", "--skip-get-frames", action="store_true", help="Whether to get frames."
     )
     parser.add_argument(
-        "-c", "--crop-images", action="store_true", help="Whether to crop images."
+        "-c", "--skip-crop-images", action="store_true", help="Whether to crop images."
     )
     parser.add_argument(
         "-l", "--log", action="store_true", help="Whether to log debug messages."

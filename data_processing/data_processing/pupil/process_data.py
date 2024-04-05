@@ -11,7 +11,6 @@ from pathlib import Path
 import pickle
 import re
 from scipy.interpolate import CubicSpline
-import sys
 from typing import Dict, List
 
 EXCLUSION_WORDS = ("transition",)
