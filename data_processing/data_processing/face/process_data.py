@@ -9,7 +9,7 @@ import re
 import shutil
 from sklearn.model_selection import train_test_split
 
-from data_processing.face.crop_ui import run_image_cropper_with_image
+from data_processing.face.crop import crop
 from data_processing.face.video_to_images import extract_frames
 
 RATE = 1
@@ -195,26 +195,20 @@ def process_data(
         for image_dir in image_dirs:
             logging.debug("Cropping images in %s", image_dir)
 
-            files = sorted(
-                [entry.path for entry in os.scandir(image_dir) if entry.is_file()]
-            )
+            cropped_dir = image_dir / "cropped"
+            if not cropped_dir.exists():
+                os.makedirs(cropped_dir)
 
-            logging.debug("Files: %s", files)
+            # Iterate over the images
+            for file in os.listdir(image_dir):
+                image_path = image_dir / file
+                if not Path(image_path).is_file():
+                    continue
 
-            # Check if the directory is not empty
-            if len(files) > 0:
-                # Find the midpoint index
-                midpoint_index = len(files) // 2
-
-                # Get the file at the midpoint index
-                halfway_file = files[midpoint_index]
-                logging.debug("Halfway file: %s", halfway_file)
                 try:
-                    run_image_cropper_with_image(image_path=halfway_file)
+                    crop(image_path, cropped_dir)
                 except ValueError as e:
                     logging.error("Error cropping images: %s", e)
-            else:
-                logging.error("Error: Directory is empty")
 
     try:
         separate_images(image_dirs, output_path, binary)
