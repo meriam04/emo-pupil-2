@@ -1,2 +1,2 @@
 Binary: Epoch 10
-Multiclass: Epoch 9
+Multiclass: Epoch 10

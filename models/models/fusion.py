@@ -101,7 +101,7 @@ if __name__ == "__main__":
     random.set_seed(496)
 
     window_size = 100
-    image_shape = (224, 224, 3)
+    image_shape = (224, 224, 1)
 
     # Get the dataset and classes
     test_set, classes = get_data(Path(sys.argv[1]), Path(sys.argv[2]), image_shape[0:2], window_size)
