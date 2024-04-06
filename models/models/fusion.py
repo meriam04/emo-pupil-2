@@ -114,8 +114,8 @@ if __name__ == "__main__":
     pupil_model = pupil.create_model(2, input_shape)
 
     # Load the weights
-    face_model.load_weights(face.BINARY_CHECKPOINT_PATH if len(classes) == 2 else face.MULTICLASS_CHECKPOINT_PATH)
-    pupil_model.load_weights(pupil.CHECKPOINT_PATH)
+    face_model.load_weights(face.BINARY_CHECKPOINT_PATH if len(classes) == 2 else face.MULTICLASS_CHECKPOINT_PATH).expect_partial()
+    pupil_model.load_weights(pupil.CHECKPOINT_PATH).expect_partial()
 
     # Get the accuracy on the test set
     correct = 0

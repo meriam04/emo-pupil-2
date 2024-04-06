@@ -217,7 +217,7 @@ def process_data(
                 logging.error("Error: Directory is empty")
 
     try:
-        separate_images(image_dirs, output_path, binary)
+        separate_images(image_dirs, output_path, binary, split_files=False, split_participants=False)
     except FileNotFoundError as e:
         logging.error("Error separating images: %s", e)
     return output_path
