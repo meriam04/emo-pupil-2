@@ -5,7 +5,7 @@ import tensorflow as tf
 from models.face.train import create_model, get_data
 
 BINARY_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/binary-010.ckpt"
-MULTICLASS_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/multiclass-009.ckpt"
+MULTICLASS_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/multiclass-010.ckpt"
 
 if __name__ == "__main__":
     # Disable annoying tensorflow warnings

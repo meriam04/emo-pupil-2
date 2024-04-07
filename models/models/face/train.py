@@ -35,6 +35,7 @@ def get_data(image_dir: Path, image_size: Tuple[int, int], batch_size: int = 32)
     # Generate train and val set from directory
     dataset = image_dataset_from_directory(
         image_dir,
+        color_mode="grayscale",
         batch_size=batch_size,
         image_size=image_size,
     )
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     tf.random.set_seed(496)
 
     batch_size = 32
-    image_shape = (224, 224, 3)
+    image_shape = (224, 224, 1)
 
     train_set, classes = get_data(
         Path(sys.argv[1]) / "train", image_shape[0:2], batch_size
