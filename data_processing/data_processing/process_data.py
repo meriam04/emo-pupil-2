@@ -14,11 +14,12 @@ def process_data(
     binary_face: bool = False,
     skip_get_frames: bool = False,
     skip_crop_images: bool = False,
+    use_crop_ui: bool = False,
     log: bool = False,
     plot_matlab: bool = False,
     plot_result: bool = False,
 ):
-    face.process_data(video_dir, output_path, binary_face, skip_get_frames, skip_crop_images, log)
+    face.process_data(video_dir, output_path, binary_face, skip_get_frames, skip_crop_images, use_crop_ui, log)
     pupil.process_data(pupil_dir, plot_matlab, plot_result)
 
 
@@ -51,6 +52,9 @@ def parse_arguments():
         "-c", "--skip-crop-images", action="store_true", help="Whether to crop images."
     )
     parser.add_argument(
+        "-u", "--use_crop_ui", action="store_true", help="If true, use the manual cropping UI instead of automated cropping."
+    )
+    parser.add_argument(
         "-l", "--log", action="store_true", help="Whether to enable logging."
     )
     parser.add_argument(
@@ -76,6 +80,7 @@ if __name__ == "__main__":
         args.binary_face,
         args.skip_get_frames,
         args.skip_crop_images,
+        args.use_crop_ui,
         args.log,
         args.plot_matlab,
         args.plot_result,

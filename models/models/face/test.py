@@ -15,7 +15,7 @@ if __name__ == "__main__":
     tf.random.set_seed(496)
 
     batch_size = 32
-    image_shape = (224, 224, 3)
+    image_shape = (224, 224, 1)
 
     test_set, classes = get_data(
         Path(sys.argv[1]) / "test", image_shape[0:2], batch_size
