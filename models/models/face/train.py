@@ -21,6 +21,10 @@ BINARY_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/binary-{epoch:03d}
 MULTICLASS_CHECKPOINT_PATH = Path(__file__).parent / "checkpoints/multiclass-{epoch:03d}.ckpt"
 
 
+BINARY_CLASSES = 2
+MULTICLASS_CLASSES = 7
+
+
 def get_data(image_dir: Path, image_size: Tuple[int, int], batch_size: int = 32):
     """
     Get the data from the emotion directories and create the dataset.
@@ -108,7 +112,8 @@ if __name__ == "__main__":
         Path(sys.argv[1]) / "val", image_shape[0:2], batch_size
     )
 
-    num_classes = len(classes)
+    binary = False
+    num_classes = BINARY_CLASSES if binary else MULTICLASS_CLASSES
 
     # Create the CNN model
     model = create_model(num_classes, image_shape)

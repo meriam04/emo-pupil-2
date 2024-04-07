@@ -67,7 +67,7 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
                             continue
 
                         # Get the image for the time
-                        image = Image.open(face_dir / label / f"{inits}_{emotion}_{end_time}_c.png")
+                        image = Image.open(face_dir / label / f"{inits}_{emotion}_{end_time}_c.png").convert('L')
                         image = image.resize(image_shape)
                         images.append(img_to_array(image))
 
@@ -107,7 +107,8 @@ if __name__ == "__main__":
     test_set, classes = get_data(Path(sys.argv[1]), Path(sys.argv[2]), image_shape[0:2], window_size)
 
     input_shape = (window_size, 1)
-    num_classes = len(classes)
+    binary = False
+    num_classes = face.BINARY_CLASSES if binary else face.MULTICLASS_CLASSES
 
     # Create the models
     face_model = face.create_model(num_classes, image_shape)
