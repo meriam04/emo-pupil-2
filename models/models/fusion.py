@@ -45,6 +45,7 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
                 splines[inits][emotion] = pickle.load(f)
 
     # Generate the dilations_windows, labels, and classes
+    names = []
     images = []
     dilation_windows = []
     labels = []
@@ -66,8 +67,12 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
                         if end_time < pupil.PERIOD * window_size:
                             continue
 
+                        # Construct the image name
+                        name = f"{inits}_{emotion}_{end_time}_c.png"
+                        names.append(name)
+
                         # Get the image for the time
-                        image = Image.open(face_dir / label / f"{inits}_{emotion}_{end_time}_c.png")
+                        image = Image.open(face_dir / label / name)
                         image = image.resize(image_shape)
                         images.append(img_to_array(image))
 
@@ -77,10 +82,11 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
                         labels.append(i)
 
     # Convert the dilations and labels to a tensor dataset
+    names_t = convert_to_tensor(names)
     images_t = convert_to_tensor(images)
     dilations_t = convert_to_tensor(dilation_windows)
     labels_t = convert_to_tensor(labels)
-    dataset = Dataset.from_tensor_slices((images_t, dilations_t, labels_t))
+    dataset = Dataset.from_tensor_slices((names_t, images_t, dilations_t, labels_t))
 
     # Prefetch datasets
     dataset = dataset.batch(1).cache().shuffle(1000).prefetch(AUTOTUNE)
@@ -121,9 +127,10 @@ if __name__ == "__main__":
     correct = 0
     labels = []
     predictions = []
-    for face_image, pupil_window, label in test_set:
-        face_prediction = face_model.predict(face_image)
-        pupil_prediction = pupil_model.predict(pupil_window)
+    prediction_classes = set()
+    for image_name, face_image, pupil_window, label in test_set:
+        face_prediction = face_model.predict(face_image, verbose=None)
+        pupil_prediction = pupil_model.predict(pupil_window, verbose=None)
 
         if len(classes) != 2:
             multiclass_pupil_prediction = []
@@ -138,8 +145,11 @@ if __name__ == "__main__":
         prediction = np.argmax(face_prediction + pupil_prediction)
         labels.append(label)
         predictions.append(prediction)
+        prediction_classes.add(classes[prediction])
         if prediction == label:
             correct += 1
+        
+        print(f"Predicted {classes[prediction]} for {image_name}")
 
     print(f"Test accuracy: {correct/len(test_set)}")
-    create_confusion_matrix(labels, predictions, classes)
+    create_confusion_matrix(labels, predictions, sorted(prediction_classes))

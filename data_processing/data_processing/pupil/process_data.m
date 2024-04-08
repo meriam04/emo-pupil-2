@@ -46,7 +46,7 @@ function [] = process_data(dir, in_csv_file, mat_file, data_csv_file, seg_csv_fi
     
     segmentStart = segment_start';
     segmentEnd = segment_end';
-    segmentName = char(segment_name');
+    segmentName = string(segment_name');
     segmentsTable = table(segmentStart, segmentEnd, segmentName);
     
     % Create RawFileModel to be used as input to PupilDataModel
