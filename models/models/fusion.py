@@ -107,8 +107,7 @@ if __name__ == "__main__":
     test_set, classes = get_data(Path(sys.argv[1]), Path(sys.argv[2]), image_shape[0:2], window_size)
 
     input_shape = (window_size, 1)
-    binary = False
-    num_classes = face.BINARY_CLASSES if binary else face.MULTICLASS_CLASSES
+    num_classes = len(classes)
 
     # Create the models
     face_model = face.create_model(num_classes, image_shape)
