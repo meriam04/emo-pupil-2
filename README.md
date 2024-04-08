@@ -33,7 +33,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/meriam04/emotion-watchers">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/transparent_logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Emotion Watchers</h3>
