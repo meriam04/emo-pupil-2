@@ -18,6 +18,9 @@ import models.face as face
 import models.pupil as pupil
 
 
+PREDICTIONS_CSV = Path(__file__).parent / "predictions.csv"
+
+
 def get_data(
     pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window_size: int = 100
 ):
@@ -48,6 +51,7 @@ def get_data(
                 splines[inits][emotion] = pickle.load(f)
 
     # Generate the dilations_windows, labels, and classes
+    names = []
     images = []
     dilation_windows = []
     labels = []
@@ -69,10 +73,12 @@ def get_data(
                         if end_time < pupil.PERIOD * window_size:
                             continue
 
-                        # Get the image for the time and convert to grayscale
-                        image = Image.open(
-                            face_dir / label / f"{inits}_{emotion}_{end_time}_c.png"
-                        ).convert("L")
+                        # Construct the image name
+                        name = f"{inits}_{emotion}_{end_time}_c.png"
+                        names.append(name)
+
+                        # Get the image for the time
+                        image = Image.open(face_dir / label / name)
                         image = image.resize(image_shape)
                         images.append(img_to_array(image))
 
@@ -84,10 +90,11 @@ def get_data(
                         labels.append(i)
 
     # Convert the dilations and labels to a tensor dataset
+    names_t = convert_to_tensor(names)
     images_t = convert_to_tensor(images)
     dilations_t = convert_to_tensor(dilation_windows)
     labels_t = convert_to_tensor(labels)
-    dataset = Dataset.from_tensor_slices((images_t, dilations_t, labels_t))
+    dataset = Dataset.from_tensor_slices((names_t, images_t, dilations_t, labels_t))
 
     # Prefetch datasets
     dataset = dataset.batch(1).cache().shuffle(1000).prefetch(AUTOTUNE)
@@ -99,8 +106,8 @@ def create_confusion_matrix(labels, predictions, classes):
     cm = confusion_matrix(labels, predictions)
     disp = ConfusionMatrixDisplay(cm, display_labels=classes)
     disp.plot()
-    plt.savefig(Path(__file__).parent / "confusion_matrix.png")
-
+    plt.title("Confusion Matrix")
+    plt.savefig(Path(__file__).parent / 'confusion_matrix.png')
 
 if __name__ == "__main__":
     # Disable annoying tensorflow warnings
@@ -125,20 +132,18 @@ if __name__ == "__main__":
     pupil_model = pupil.create_model(2, input_shape)
 
     # Load the weights
-    face_model.load_weights(
-        face.BINARY_CHECKPOINT_PATH
-        if len(classes) == 2
-        else face.MULTICLASS_CHECKPOINT_PATH
-    )
-    pupil_model.load_weights(pupil.CHECKPOINT_PATH)
+    face_model.load_weights(face.BINARY_CHECKPOINT_PATH if len(classes) == 2 else face.MULTICLASS_CHECKPOINT_PATH).expect_partial()
+    pupil_model.load_weights(pupil.CHECKPOINT_PATH).expect_partial()
 
     # Get the accuracy on the test set
     correct = 0
     labels = []
-    predictions = []
-    for face_image, pupil_window, label in test_set:
-        face_prediction = face_model.predict(face_image)
-        pupil_prediction = pupil_model.predict(pupil_window)
+    predictions = {}
+    prediction_classes = set()
+    for image_name, face_image, pupil_window, label in test_set:
+        image = image_name.numpy()[0].decode('ascii')
+        face_prediction = face_model.predict(face_image, verbose=None)
+        pupil_prediction = pupil_model.predict(pupil_window, verbose=None)
 
         if len(classes) != 2:
             multiclass_pupil_prediction = []
@@ -152,9 +157,21 @@ if __name__ == "__main__":
         # Check that the label matches the emotion with the highest probability
         prediction = np.argmax(face_prediction + pupil_prediction)
         labels.append(label)
-        predictions.append(prediction)
+        predictions[image] = prediction
+        prediction_classes.add(classes[label[0]])
+        prediction_classes.add(classes[prediction])
         if prediction == label:
             correct += 1
+        
+        print(f"Predicted {classes[prediction]} for {image}")
 
     print(f"Test accuracy: {correct/len(test_set)}")
-    create_confusion_matrix(labels, predictions, classes)
+    create_confusion_matrix(labels, list(predictions.values()), sorted(prediction_classes))
+
+    # Save csv of predictions
+    with open(PREDICTIONS_CSV, 'w') as f:
+        writer = csv.DictWriter(f, ['image', 'prediction'])
+        writer.writeheader()
+
+        for k, v in predictions.items():
+            writer.writerow({'image': k, 'prediction': classes[v]})

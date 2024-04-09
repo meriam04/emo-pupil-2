@@ -117,6 +117,7 @@ def process_participant(
                 plt.plot(
                     seg_data["times"], seg_data["diameters"], "k", label="discrete"
                 )
+                plt.title("Smoothed Pupil Function")
                 plt.savefig(f"./{output_file}.png")
 
             with open(output_file, "wb") as f:
