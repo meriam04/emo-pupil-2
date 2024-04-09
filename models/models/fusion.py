@@ -97,6 +97,7 @@ def create_confusion_matrix(labels, predictions, classes):
     cm = confusion_matrix(labels, predictions)
     disp = ConfusionMatrixDisplay(cm, display_labels=classes)
     disp.plot()
+    plt.title("Confusion Matrix")
     plt.savefig(Path(__file__).parent / 'confusion_matrix.png')
 
 if __name__ == "__main__":
@@ -145,11 +146,12 @@ if __name__ == "__main__":
         prediction = np.argmax(face_prediction + pupil_prediction)
         labels.append(label)
         predictions.append(prediction)
+        prediction_classes.add(classes[label[0]])
         prediction_classes.add(classes[prediction])
         if prediction == label:
             correct += 1
         
-        print(f"Predicted {classes[prediction]} for {image_name}")
+        print(f"Predicted {classes[prediction]} for {image_name.numpy()[0].decode('ascii')}")
 
     print(f"Test accuracy: {correct/len(test_set)}")
     create_confusion_matrix(labels, predictions, sorted(prediction_classes))
