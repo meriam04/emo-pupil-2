@@ -70,6 +70,7 @@ An experiment was conducted where participants were shown a series of music vide
 - Happy
 - Joy
 - Sad
+
 Each participants' facial reaction, pupillometry response, and emotion were recorded.
 
 ### Data Processing
