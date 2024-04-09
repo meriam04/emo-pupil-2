@@ -17,7 +17,10 @@ from data_processing.face.process_data import BINARY_EMOTIONS, TIMES_FILE_FORMAT
 import models.face as face
 import models.pupil as pupil
 
-def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window_size: int = 100):
+
+def get_data(
+    pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window_size: int = 100
+):
     """
     Get the functions from the .pkl files and timestamps from the face directories, then create the dataset.
 
@@ -41,7 +44,7 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
             if match["inits"] not in splines:
                 splines[match["inits"]] = {}
 
-            with open(pkl_dir / file, 'rb') as f:
+            with open(pkl_dir / file, "rb") as f:
                 splines[inits][emotion] = pickle.load(f)
 
     # Generate the dilations_windows, labels, and classes
@@ -59,7 +62,7 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
                 if not os.path.isfile(times_path):
                     continue
 
-                with open(times_path, 'r') as f:
+                with open(times_path, "r") as f:
                     reader = csv.DictReader(f)
                     for row in reader:
                         # Check if a window can be generated for this time
@@ -77,7 +80,9 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
                         images.append(img_to_array(image))
 
                         # Generate a window for this time
-                        times = np.linspace(end_time - pupil.PERIOD * window_size, end_time, window_size)
+                        times = np.linspace(
+                            end_time - pupil.PERIOD * window_size, end_time, window_size
+                        )
                         dilation_windows.append(spline(times))
                         labels.append(i)
 
@@ -93,6 +98,7 @@ def get_data(pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window
 
     return dataset, classes
 
+
 def create_confusion_matrix(labels, predictions, classes):
     cm = confusion_matrix(labels, predictions)
     disp = ConfusionMatrixDisplay(cm, display_labels=classes)
@@ -102,7 +108,7 @@ def create_confusion_matrix(labels, predictions, classes):
 
 if __name__ == "__main__":
     # Disable annoying tensorflow warnings
-    get_logger().setLevel('ERROR')
+    get_logger().setLevel("ERROR")
 
     # Fix random seed for reproducibility
     random.set_seed(496)
@@ -111,7 +117,9 @@ if __name__ == "__main__":
     image_shape = (224, 224, 1)
 
     # Get the dataset and classes
-    test_set, classes = get_data(Path(sys.argv[1]), Path(sys.argv[2]), image_shape[0:2], window_size)
+    test_set, classes = get_data(
+        Path(sys.argv[1]), Path(sys.argv[2]), image_shape[0:2], window_size
+    )
 
     input_shape = (window_size, 1)
     num_classes = len(classes)

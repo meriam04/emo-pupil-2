@@ -10,6 +10,7 @@ from tensorflow.keras.layers import (
     Flatten,
     Input,
     MaxPooling2D,
+    RandomFlip,
     Rescaling,
 )
 from tensorflow.keras.utils import image_dataset_from_directory
@@ -66,6 +67,7 @@ def create_model(num_classes: int, input_shape: Optional[Tuple[int, int, int]] =
         model.add(Input(input_shape))
 
     model.add(Rescaling(1.0 / 255))
+    model.add(RandomFlip("horizontal"))
     model.add(Conv2D(32, 3, activation="relu"))
     model.add(MaxPooling2D())
     model.add(Conv2D(32, 3, activation="relu"))
