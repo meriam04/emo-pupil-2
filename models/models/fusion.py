@@ -18,6 +18,9 @@ import models.face as face
 import models.pupil as pupil
 
 
+PREDICTIONS_CSV = Path(__file__).parent / "predictions.csv"
+
+
 def get_data(
     pkl_dir: Path, face_dir: Path, image_shape: Tuple[int, int], window_size: int = 100
 ):
@@ -135,9 +138,10 @@ if __name__ == "__main__":
     # Get the accuracy on the test set
     correct = 0
     labels = []
-    predictions = []
+    predictions = {}
     prediction_classes = set()
     for image_name, face_image, pupil_window, label in test_set:
+        image = image_name.numpy()[0].decode('ascii')
         face_prediction = face_model.predict(face_image, verbose=None)
         pupil_prediction = pupil_model.predict(pupil_window, verbose=None)
 
@@ -153,13 +157,21 @@ if __name__ == "__main__":
         # Check that the label matches the emotion with the highest probability
         prediction = np.argmax(face_prediction + pupil_prediction)
         labels.append(label)
-        predictions.append(prediction)
+        predictions[image] = prediction
         prediction_classes.add(classes[label[0]])
         prediction_classes.add(classes[prediction])
         if prediction == label:
             correct += 1
         
-        print(f"Predicted {classes[prediction]} for {image_name.numpy()[0].decode('ascii')}")
+        print(f"Predicted {classes[prediction]} for {image}")
 
     print(f"Test accuracy: {correct/len(test_set)}")
-    create_confusion_matrix(labels, predictions, sorted(prediction_classes))
+    create_confusion_matrix(labels, list(predictions.values()), sorted(prediction_classes))
+
+    # Save csv of predictions
+    with open(PREDICTIONS_CSV, 'w') as f:
+        writer = csv.DictWriter(f, ['image', 'prediction'])
+        writer.writeheader()
+
+        for k, v in predictions.items():
+            writer.writerow({'image': k, 'prediction': classes[v]})
